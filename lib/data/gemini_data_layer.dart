@@ -11,19 +11,10 @@ class GeminiDataLayer {
 
   GeminiDataLayer(this.config, this.dio);
 
-  Future<DataResponse<RawGeminiLoginResponse>> login(
-      String email, String password) async {
-    return DataResponse.success(
-        RawGeminiLoginResponse.fromJson(<String, dynamic>{
-      "user": {},
-      "session": {"token": "mockToken"},
-      "brand": {}
-    }));
+  Future<DataResponse<RawGeminiLoginResponse>> login(String email, String password) async {
     try {
       final response = await dio.post(
-        config.geminiOverrideBaseUrl == null
-            ? 'https://api.houston.xyz:2070'
-            : config.geminiOverrideBaseUrl!,
+        config.geminiOverrideBaseUrl == null ? 'https://api.gemini.xyz:2070' : config.geminiOverrideBaseUrl!,
         data: {
           "email": email,
           "password": password,
@@ -31,33 +22,29 @@ class GeminiDataLayer {
       );
 
       final successResponse = handleResponse(response);
-      return DataResponse.success(
-          RawGeminiLoginResponse.fromJson(successResponse.payload));
+      return DataResponse.success(RawGeminiLoginResponse.fromJson(successResponse.payload));
     } on DioError catch (dioError) {
-      if (dioError.type == DioErrorType.connectTimeout ||
-          dioError.type == DioErrorType.receiveTimeout) {
-        return const DataResponse.failure(TimeoutFailure());
+      if (dioError.type == DioErrorType.connectTimeout || dioError.type == DioErrorType.receiveTimeout) {
+        return const DataResponse.failure(GeminiTimeoutFailure());
       } else if (dioError.message.contains('SocketException')) {
-        return const DataResponse.failure(ServerConnectionFailure());
+        return const DataResponse.failure(GeminiServerConnectionFailure());
       }
 
-      return const DataResponse.failure(InternalServerFailure());
-    } on ApiError catch (apiError) {
-      return const DataResponse.failure(InternalServerFailure());
+      return const DataResponse.failure(GeminiInternalServerFailure());
+    } on ApiError {
+      return const DataResponse.failure(GeminiInternalServerFailure());
     } on GeminiError catch (geminiError) {
-      return DataResponse.failure(
-          GeminiErrorResponseFailure(geminiError.error, geminiError.message));
+      return DataResponse.failure(GeminiErrorResponseFailure(geminiError.error, geminiError.message));
     } catch (e, st) {
       print('$e $st');
-      return const DataResponse.failure(UnknownFailure());
+      return const DataResponse.failure(GeminiUnknownFailure());
     }
   }
 
   SuccessResponse handleResponse(Response response) {
     if (response.data['success'] == true) {
       return SuccessResponse(response.data['payload']);
-    } else if (response.data['success'] == false ||
-        response.data['payload'] == null) {
+    } else if (response.data['success'] == false || response.data['payload'] == null) {
       throw GeminiError(
         response.data['code'],
         response.data['error'],

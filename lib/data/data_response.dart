@@ -1,7 +1,7 @@
 import 'failure.dart';
 
 class DataResponse<T> {
-  final Failure? failure;
+  final GeminiFailure? failure;
   final T? content;
   final bool isSuccessful;
 
