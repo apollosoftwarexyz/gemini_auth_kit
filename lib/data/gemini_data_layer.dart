@@ -14,12 +14,12 @@ class GeminiDataLayer {
   Future<DataResponse<RawGeminiLoginResponse>> login(String email, String password) async {
     try {
       final response = await dio.post(
-        config.geminiOverrideBaseUrl == null ? 'https://api.gemini.xyz:2070' : config.geminiOverrideBaseUrl!,
-        data: {
-          "email": email,
-          "password": password,
-        },
-      );
+          config.geminiOverrideBaseUrl == null ? 'https://api.gemini.xyz:2070' : config.geminiOverrideBaseUrl!,
+          data: {
+            "email": email,
+            "password": password,
+          },
+          options: Options(sendTimeout: config.connectionTimeout, receiveTimeout: config.recieveTimeout));
 
       final successResponse = handleResponse(response);
       return DataResponse.success(RawGeminiLoginResponse.fromJson(successResponse.payload));
