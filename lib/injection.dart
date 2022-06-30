@@ -7,10 +7,15 @@ final GetIt locator = GetIt.instance;
 
 /// Configures the dependencies for this package
 ///
-/// Requies that an implementation for the following classes
+/// Requires that an implementation for the following classes
 /// have been registered: [GeminiConfig] [GeminiResponseHandler]
+///
+/// An instance of Dio will be used as the API client - one is
+/// created if not provided
 Future<void> configureInjection(GetIt locator) async {
-  locator.registerSingleton(Dio());
+  if (!locator.isRegistered<Dio>()) {
+    locator.registerSingleton(Dio());
+  }
 
   locator.registerFactory(() => GeminiDataLayer(locator(), locator()));
   locator.registerFactory(() => GeminiLoginPageCubit(locator(), locator()));

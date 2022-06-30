@@ -5,5 +5,5 @@ abstract class GeminiConfig {
 
   int? get connectionTimeout;
 
-  int? get recieveTimeout;
+  int? get receiveTimeout;
 }

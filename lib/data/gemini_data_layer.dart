@@ -19,7 +19,7 @@ class GeminiDataLayer {
             "email": email,
             "password": password,
           },
-          options: Options(sendTimeout: config.connectionTimeout, receiveTimeout: config.recieveTimeout));
+          options: Options(sendTimeout: config.connectionTimeout, receiveTimeout: config.receiveTimeout));
 
       final successResponse = handleResponse(response);
       return DataResponse.success(RawGeminiLoginResponse.fromJson(successResponse.payload));
