@@ -16,7 +16,7 @@ class GeminiDataLayer {
           String email, String password) async =>
       await handleRequest(() async {
         final response = await dio.post(
-          '${config.geminiOverrideBaseUrl == null ? 'https://api.gemini.xyz:2070' : config.geminiOverrideBaseUrl!}/auth/login',
+          '${config.geminiOverrideBaseUrl == null ? 'https://api.gemini.xyz:2070' : config.geminiOverrideBaseUrl!}/v1/auth/login',
           data: {
             "email": email,
             "password": password,
@@ -31,7 +31,7 @@ class GeminiDataLayer {
   Future<DataResponse<GeminiLoginPageContent>> fetchLogin() async {
     return await handleRequest(() async {
       final response = await dio.get(
-        '${config.geminiOverrideBaseUrl == null ? 'https://api.gemini.xyz:2070' : config.geminiOverrideBaseUrl!}/auth/login',
+        '${config.geminiOverrideBaseUrl == null ? 'https://api.gemini.xyz:2070' : config.geminiOverrideBaseUrl!}/v1/auth/login',
         queryParameters: {
           'app_id': config.appId,
           'redirect_url': config.redirectUrl,
