@@ -393,4 +393,8 @@ class MockGeminiConfig extends _i1.Mock implements _i10.GeminiConfig {
   String get appId =>
       (super.noSuchMethod(Invocation.getter(#appId), returnValue: '')
           as String);
+  @override
+  String get redirectUrl =>
+      (super.noSuchMethod(Invocation.getter(#redirectUrl), returnValue: '')
+          as String);
 }
