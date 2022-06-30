@@ -21,6 +21,10 @@ class GeminiDataLayer {
             "email": email,
             "password": password,
           },
+          queryParameters: {
+            'app_id': config.appId,
+            'redirect_url': config.redirectUrl,
+          },
         );
 
         final successResponse = handleResponse(response);
