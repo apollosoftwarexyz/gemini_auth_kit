@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:dio/dio.dart';
 import 'package:gemini_auth_kit/abstracts/gemini_config.dart';
 import 'package:gemini_auth_kit/data/failure.dart';
@@ -71,12 +69,13 @@ class GeminiDataLayer {
   }
 
   SuccessResponse handleResponse(Response response) {
-    log(response.data as dynamic);
+    print((response.data as Map).keys.toList());
+    print((response.data as Map).values.toList());
     if (response.data['success'] == true) {
       return SuccessResponse(response.data['payload']);
     } else if (response.data['success'] == false ||
         response.data['payload'] == null) {
-      log('failure: ${response.data}');
+      print('failure: ${response.data}');
 
       throw GeminiError(
         response.data['code'],
