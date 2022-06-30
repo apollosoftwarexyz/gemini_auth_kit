@@ -2,47 +2,58 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemini_auth_kit/components/apollo_primary_button.dart';
 import 'package:gemini_auth_kit/components/app_blocking_loading_view.dart';
+import 'package:gemini_auth_kit/components/loading_indicator.dart';
 import 'package:gemini_auth_kit/injection.dart';
+import 'package:gemini_auth_kit/pages/login/gemini_login_loader_cubit.dart';
 
+import '../../abstracts/gemini_login_view_args.dart';
 import '../../components.dart';
 import '../../components/error_dialog.dart';
 import 'gemini_login_page_cubit.dart';
 
 class GeminiLoginPage extends StatelessWidget {
-  final String appName;
-  final String brandName;
-
-  final Color backgroundColor;
-  final Color primaryColor;
-  final Color fontColor;
-  final bool isLoading;
-
-  final double maxContentWidth;
-  final double headerPadding;
-  final EdgeInsets outerPadding;
-
-  final Widget headerBanner;
-
-  final String? Function(String? text)? emailValidator;
-  final String? Function(String? text)? passwordValidator;
-  final String emailHintText;
-  final String passwordHintText;
-
   const GeminiLoginPage({
-    this.appName = 'Unknown Application',
-    this.brandName = 'Unknown Brand',
-    this.isLoading = false,
-    this.backgroundColor = const Color(0xFFF9F9F9),
-    this.primaryColor = const Color(0xFF7440F6),
-    this.fontColor = const Color(0xFF0D0D0D),
-    this.maxContentWidth = 450,
-    this.headerPadding = 90,
-    this.outerPadding = const EdgeInsets.only(top: 90),
-    this.headerBanner = const SizedBox.shrink(),
-    this.emailValidator,
-    this.passwordValidator,
-    this.emailHintText = 'joebloggs@gmail.com',
-    this.passwordHintText = '*********',
+    Key? key,
+  }) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => locator<GeminiLoginLoaderCubit>(),
+      child: BlocBuilder<GeminiLoginLoaderCubit, GeminiLoginLoaderState>(
+          builder: (context, state) {
+        if (state.failure != null) {
+          return Scaffold(
+            body: Center(
+              child: Text(state.failure!),
+            ),
+          );
+        }
+        if (state.isLoading) {
+          return const Scaffold(
+            body: Center(
+              child: LoadingIndicator(
+                activeColor: Colors.black,
+                inactiveColor: Colors.white,
+                text: 'Fetching app information from Gemini',
+              ),
+            ),
+          );
+        }
+
+        return GeminiLoginPageView(GeminiLoginViewArgs(
+          appName: state.content!.application.displayName,
+          brandName: state.content!.brand.displayName,
+        ));
+      }),
+    );
+  }
+}
+
+class GeminiLoginPageView extends StatelessWidget {
+  final GeminiLoginViewArgs args;
+
+  const GeminiLoginPageView(
+    this.args, {
     Key? key,
   }) : super(key: key);
   @override
@@ -60,23 +71,9 @@ class GeminiLoginPage extends StatelessWidget {
           return AppBlockingLoadingView(
             isBlocking: state.isLoading,
             child: GeminiLoginView(
+              args,
               onSignIn: (email, password) =>
                   context.read<GeminiLoginPageCubit>().login(email, password),
-              appName: appName,
-              brandName: brandName,
-              isLoading: isLoading,
-              backgroundColor: backgroundColor,
-              primaryColor: primaryColor,
-              fontColor: fontColor,
-              maxContentWidth: maxContentWidth,
-              headerPadding: headerPadding,
-              outerPadding: outerPadding,
-              headerBanner: headerBanner,
-              emailValidator: emailValidator,
-              passwordValidator: passwordValidator,
-              emailHintText: emailHintText,
-              passwordHintText: passwordHintText,
-              failure: state.failure,
             ),
           );
         },
@@ -86,43 +83,13 @@ class GeminiLoginPage extends StatelessWidget {
 }
 
 class GeminiLoginView extends StatefulWidget {
-  final Function(String email, String password) onSignIn;
-  final String appName;
-  final String brandName;
-
-  final Color backgroundColor;
-  final Color primaryColor;
-  final Color fontColor;
-  final bool isLoading;
-
-  final double maxContentWidth;
-  final double headerPadding;
-  final EdgeInsets outerPadding;
-
-  final Widget headerBanner;
-
-  final String? Function(String? text)? emailValidator;
-  final String? Function(String? text)? passwordValidator;
-  final String emailHintText;
-  final String passwordHintText;
+  final GeminiLoginViewArgs args;
   final String? failure;
+  final Function(String email, String password) onSignIn;
 
-  const GeminiLoginView({
+  const GeminiLoginView(
+    this.args, {
     required this.onSignIn,
-    this.appName = 'Unknown Application',
-    this.brandName = 'Unknown Brand',
-    this.isLoading = false,
-    this.backgroundColor = const Color(0xFFF9F9F9),
-    this.primaryColor = const Color(0xFF7440F6),
-    this.fontColor = const Color(0xFF0D0D0D),
-    this.maxContentWidth = 450,
-    this.headerPadding = 90,
-    this.outerPadding = const EdgeInsets.only(top: 90),
-    this.headerBanner = const SizedBox.shrink(),
-    this.emailValidator,
-    this.passwordValidator,
-    this.emailHintText = 'joebloggs@gmail.com',
-    this.passwordHintText = '*********',
     this.failure,
     Key? key,
   }) : super(key: key);
@@ -137,18 +104,18 @@ class _GeminiLoginViewState extends State<GeminiLoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: widget.backgroundColor,
+      backgroundColor: widget.args.backgroundColor,
       body: SafeArea(
         bottom: false,
         child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: widget.maxContentWidth),
+          constraints: BoxConstraints(maxWidth: widget.args.maxContentWidth),
           child: Container(
-            margin: widget.outerPadding,
+            margin: widget.args.outerPadding,
             child: SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  widget.headerBanner,
+                  widget.args.headerBanner,
                   Container(
                       padding: const EdgeInsets.symmetric(horizontal: 50),
                       child: Column(
@@ -167,14 +134,14 @@ class _GeminiLoginViewState extends State<GeminiLoginView> {
                               fontFamily: "Jost",
                               fontWeight: FontWeight.bold,
                               fontSize: 42,
-                              color: widget.fontColor,
+                              color: widget.args.fontColor,
                             ),
                           ),
                           Container(height: 10),
                           RichText(
                             text: TextSpan(
                               style: TextStyle(
-                                  color: widget.fontColor,
+                                  color: widget.args.fontColor,
                                   fontFamily: "Jost",
                                   fontSize: 18),
                               children: <TextSpan>[
@@ -182,13 +149,13 @@ class _GeminiLoginViewState extends State<GeminiLoginView> {
                                   text: 'Please sign in to access',
                                 ),
                                 TextSpan(
-                                  text: " ${widget.appName} ",
+                                  text: " ${widget.args.appName} ",
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold),
                                 ),
                                 TextSpan(
                                     text:
-                                        'with your ${widget.brandName} account.')
+                                        'with your ${widget.args.brandName} account.')
                               ],
                             ),
                           ),
@@ -205,8 +172,8 @@ class _GeminiLoginViewState extends State<GeminiLoginView> {
                           Container(height: 7.5),
                           ApolloInputField(
                             controller: emailController,
-                            hintText: widget.emailHintText,
-                            validator: widget.emailValidator,
+                            hintText: widget.args.emailHintText,
+                            validator: widget.args.emailValidator,
                           ),
                           Container(height: 10),
                           Text("Password:",
@@ -219,9 +186,9 @@ class _GeminiLoginViewState extends State<GeminiLoginView> {
                           Container(height: 7.5),
                           ApolloInputField(
                             controller: passwordController,
-                            hintText: widget.passwordHintText,
+                            hintText: widget.args.passwordHintText,
                             obscureText: true,
-                            validator: widget.passwordValidator,
+                            validator: widget.args.passwordValidator,
                           ),
                           InkWell(
                               splashColor: Colors.transparent,
@@ -239,7 +206,7 @@ class _GeminiLoginViewState extends State<GeminiLoginView> {
                       )),
                   Container(height: 30),
                   ApolloPrimaryButton(
-                      text: 'Sign in to ${widget.appName}',
+                      text: 'Sign in to ${widget.args.appName}',
                       onPressed: () => widget.onSignIn(
                           emailController.text, passwordController.text)),
                   Container(height: 20),
@@ -250,7 +217,7 @@ class _GeminiLoginViewState extends State<GeminiLoginView> {
                     child: RichText(
                       text: TextSpan(
                         style: TextStyle(
-                            color: widget.fontColor,
+                            color: widget.args.fontColor,
                             fontFamily: "Jost",
                             fontSize: 14),
                         children: const <TextSpan>[

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:gemini_auth_kit/abstracts/gemini_config.dart';
 import 'package:gemini_auth_kit/data/failure.dart';
 
+import '../entities/gemini_login_page_content.dart';
 import '../entities/gemini_login_response.dart';
 import 'data_response.dart';
 
@@ -12,21 +13,41 @@ class GeminiDataLayer {
   GeminiDataLayer(this.config, this.dio);
 
   Future<DataResponse<RawGeminiLoginResponse>> login(
-      String email, String password) async {
-    try {
-      final response = await dio.post(
-        config.geminiOverrideBaseUrl == null
-            ? 'https://api.gemini.xyz:2070'
-            : config.geminiOverrideBaseUrl!,
-        data: {
-          "email": email,
-          "password": password,
+          String email, String password) async =>
+      await handleRequest(() async {
+        final response = await dio.post(
+          '${config.geminiOverrideBaseUrl == null ? 'https://api.gemini.xyz:2070' : config.geminiOverrideBaseUrl!}/auth/login',
+          data: {
+            "email": email,
+            "password": password,
+          },
+        );
+
+        final successResponse = handleResponse(response);
+        return DataResponse.success(
+            RawGeminiLoginResponse.fromJson(successResponse.payload));
+      });
+
+  Future<DataResponse<GeminiLoginPageContent>> fetchLogin() async {
+    return await handleRequest(() async {
+      final response = await dio.get(
+        '${config.geminiOverrideBaseUrl == null ? 'https://api.gemini.xyz:2070' : config.geminiOverrideBaseUrl!}/auth/login',
+        queryParameters: {
+          'app_id': config.appId,
+          'redirect_url': config.redirectUrl,
         },
       );
 
       final successResponse = handleResponse(response);
       return DataResponse.success(
-          RawGeminiLoginResponse.fromJson(successResponse.payload));
+          GeminiLoginPageContent.fromJson(successResponse.payload));
+    });
+  }
+
+  Future<DataResponse<T>> handleRequest<T>(
+      Future<DataResponse<T>> Function() tryFunction) async {
+    try {
+      return await tryFunction();
     } on DioError catch (dioError) {
       if (dioError.type == DioErrorType.connectTimeout ||
           dioError.type == DioErrorType.receiveTimeout) {
