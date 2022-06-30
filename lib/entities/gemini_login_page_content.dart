@@ -18,7 +18,6 @@ class GeminiLoginPageContent {
   Map<String, dynamic> toJson() => _$GeminiLoginPageContentToJson(this);
 
   factory GeminiLoginPageContent.fromJson(Map<String, dynamic> json) {
-    print(json);
     return _$GeminiLoginPageContentFromJson(json);
   }
 }
