@@ -5,6 +5,8 @@ import 'package:gemini_auth_kit/pages/login/gemini_login_page_cubit.dart';
 import 'package:gemini_auth_kit/services/gemini_authentication_service.dart';
 import 'package:get_it/get_it.dart';
 
+import 'pages/login/gemini_login_loader_cubit.dart';
+
 final GetIt locator = GetIt.instance;
 
 /// Configures the dependencies for this package
@@ -23,4 +25,5 @@ Future<void> configureInjection(GetIt locator) async {
   locator.registerLazySingleton<GeminiAuthenticationService>(
       () => GeminiAuthenticationServiceImpl(locator()));
   locator.registerFactory(() => GeminiLoginPageCubit(locator(), locator()));
+  locator.registerFactory(() => GeminiLoginLoaderCubit(locator()));
 }

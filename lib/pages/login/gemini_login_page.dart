@@ -2,52 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemini_auth_kit/components/apollo_primary_button.dart';
 import 'package:gemini_auth_kit/components/app_blocking_loading_view.dart';
-import 'package:gemini_auth_kit/components/loading_indicator.dart';
 import 'package:gemini_auth_kit/injection.dart';
-import 'package:gemini_auth_kit/pages/login/gemini_login_loader_cubit.dart';
 
 import '../../abstracts/gemini_login_view_args.dart';
 import '../../components.dart';
 import '../../components/error_dialog.dart';
 import 'gemini_login_page_cubit.dart';
-
-class GeminiLoginPage extends StatelessWidget {
-  const GeminiLoginPage({
-    Key? key,
-  }) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => locator<GeminiLoginLoaderCubit>(),
-      child: BlocBuilder<GeminiLoginLoaderCubit, GeminiLoginLoaderState>(
-          builder: (context, state) {
-        if (state.failure != null) {
-          return Scaffold(
-            body: Center(
-              child: Text(state.failure!),
-            ),
-          );
-        }
-        if (state.isLoading) {
-          return const Scaffold(
-            body: Center(
-              child: LoadingIndicator(
-                activeColor: Colors.black,
-                inactiveColor: Colors.white,
-                text: 'Fetching app information from Gemini',
-              ),
-            ),
-          );
-        }
-
-        return GeminiLoginPageView(GeminiLoginViewArgs(
-          appName: state.content!.application.displayName,
-          brandName: state.content!.brand.displayName,
-        ));
-      }),
-    );
-  }
-}
 
 class GeminiLoginPageView extends StatelessWidget {
   final GeminiLoginViewArgs args;
