@@ -71,7 +71,7 @@ class GeminiDataLayer {
   }
 
   SuccessResponse handleResponse(Response response) {
-    log(response.data);
+    log(response.data as dynamic);
     if (response.data['success'] == true) {
       return SuccessResponse(response.data['payload']);
     } else if (response.data['success'] == false ||

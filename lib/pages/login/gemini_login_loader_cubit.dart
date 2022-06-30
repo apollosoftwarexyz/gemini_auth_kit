@@ -29,7 +29,7 @@ class GeminiLoginLoaderCubit extends Cubit<GeminiLoginLoaderState> {
     emit(const GeminiLoginLoaderState.loading());
     final response = await authenticationService.fetchLogin();
     if (!response.isSuccessful) {
-      emit(GeminiLoginLoaderState.failure(response.failure!.reason));
+      return emit(GeminiLoginLoaderState.failure(response.failure!.reason));
     }
     emit(GeminiLoginLoaderState.content(response.content!));
   }
