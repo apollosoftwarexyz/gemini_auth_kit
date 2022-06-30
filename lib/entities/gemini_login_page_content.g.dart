@@ -11,7 +11,7 @@ GeminiLoginPageContent _$GeminiLoginPageContentFromJson(
     GeminiLoginPageContent(
       brand: json['brand'],
       application: json['application'],
-      querystring: json['querystring'] as String,
+      queryString: json['querystring'] as String,
     );
 
 Map<String, dynamic> _$GeminiLoginPageContentToJson(
@@ -19,5 +19,5 @@ Map<String, dynamic> _$GeminiLoginPageContentToJson(
     <String, dynamic>{
       'brand': instance.brand,
       'application': instance.application,
-      'querystring': instance.querystring,
+      'querystring': instance.queryString,
     };

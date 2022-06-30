@@ -4,13 +4,18 @@ part 'gemini_login_page_content.g.dart';
 
 @JsonSerializable()
 class GeminiLoginPageContent {
-
   final dynamic brand;
   final dynamic application;
-  final String querystring;
-  const GeminiLoginPageContent({required this.brand, required this.application, required this.querystring});
+  final String queryString;
 
-  Map<String,dynamic> toJson() => _$GeminiLoginPageContentToJson(this);
+  const GeminiLoginPageContent({
+    required this.brand,
+    required this.application,
+    @JsonKey(name: 'query_string') required this.queryString,
+  });
 
-  factory GeminiLoginPageContent.fromJson(Map<String, dynamic> json) => _$GeminiLoginPageContentFromJson(json);
+  Map<String, dynamic> toJson() => _$GeminiLoginPageContentToJson(this);
+
+  factory GeminiLoginPageContent.fromJson(Map<String, dynamic> json) =>
+      _$GeminiLoginPageContentFromJson(json);
 }
