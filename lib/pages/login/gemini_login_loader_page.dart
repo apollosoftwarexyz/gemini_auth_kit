@@ -14,7 +14,7 @@ class GeminiLoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => locator<GeminiLoginLoaderCubit>(),
+      create: (context) => locator<GeminiLoginLoaderCubit>()..load(),
       child: BlocBuilder<GeminiLoginLoaderCubit, GeminiLoginLoaderState>(
           builder: (context, state) {
         if (state.failure != null) {
