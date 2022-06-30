@@ -6,12 +6,13 @@ part 'gemini_login_page_content.g.dart';
 class GeminiLoginPageContent {
   final dynamic brand;
   final dynamic application;
+  @JsonKey(name: 'query_string')
   final String queryString;
 
   const GeminiLoginPageContent({
     required this.brand,
     required this.application,
-    @JsonKey(name: 'query_string') required this.queryString,
+    required this.queryString,
   });
 
   Map<String, dynamic> toJson() => _$GeminiLoginPageContentToJson(this);
