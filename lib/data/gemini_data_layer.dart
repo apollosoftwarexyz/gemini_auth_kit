@@ -5,7 +5,7 @@ import 'package:gemini_auth_kit/abstracts/gemini_config.dart';
 import 'package:gemini_auth_kit/data/failure.dart';
 
 import '../entities/gemini_login_page_content.dart';
-import '../entities/gemini_login_response.dart';
+import '../entities/gemini_success_response.dart';
 import 'data_response.dart';
 
 class GeminiDataLayer {
@@ -14,7 +14,7 @@ class GeminiDataLayer {
 
   GeminiDataLayer(this.config, this.dio);
 
-  Future<DataResponse<RawGeminiLoginResponse>> login(
+  Future<DataResponse<GeminiSuccessResponse>> login(
           String email, String password) async =>
       await handleRequest(() async {
         dio.options.followRedirects = true;
@@ -34,8 +34,7 @@ class GeminiDataLayer {
         );
 
         final successResponse = await handleResponse(response);
-        return DataResponse.success(
-            RawGeminiLoginResponse.fromJson(successResponse.payload));
+        return DataResponse.success(successResponse);
       });
 
   Future<DataResponse<GeminiLoginPageContent>> fetchLogin() async {
@@ -50,7 +49,7 @@ class GeminiDataLayer {
 
       final successResponse = await handleResponse(response);
       return DataResponse.success(
-          GeminiLoginPageContent.fromJson(successResponse.payload));
+          GeminiLoginPageContent.fromJson(successResponse.data['payload']));
     });
   }
 
@@ -79,7 +78,7 @@ class GeminiDataLayer {
     }
   }
 
-  Future<SuccessResponse> handleResponse(Response response) async {
+  Future<GeminiSuccessResponse> handleResponse(Response response) async {
     while (response.statusCode != null && response.statusCode == 302) {
       final location = response.headers.value(HttpHeaders.locationHeader);
       if (location == null) {
@@ -90,7 +89,7 @@ class GeminiDataLayer {
     }
 
     if (response.data['success'] == true) {
-      return SuccessResponse(response.data['payload']);
+      return GeminiSuccessResponse(response.data);
     } else if (response.data['success'] == false ||
         response.data['payload'] == null) {
       throw GeminiError(
@@ -101,11 +100,6 @@ class GeminiDataLayer {
     }
     throw const ApiError();
   }
-}
-
-class SuccessResponse {
-  Map<String, dynamic> payload;
-  SuccessResponse(this.payload);
 }
 
 class GeminiError implements Exception {

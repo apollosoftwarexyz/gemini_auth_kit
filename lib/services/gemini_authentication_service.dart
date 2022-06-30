@@ -15,7 +15,7 @@ class GeminiAuthenticationServiceImpl extends GeminiAuthenticationService {
   }
 
   @override
-  Future<DataResponse<RawGeminiLoginResponse>> login(
+  Future<DataResponse<GeminiSuccessResponse>> login(
       String email, String password) {
     // TODO: Log with analytics
     return _dataLayer.login(email, password);
