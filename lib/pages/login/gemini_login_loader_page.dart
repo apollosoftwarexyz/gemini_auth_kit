@@ -37,8 +37,8 @@ class GeminiLoginPage extends StatelessWidget {
         }
 
         return GeminiLoginPageView(GeminiLoginViewArgs(
-          appName: state.content!.application.displayName,
-          brandName: state.content!.brand.displayName,
+          appName: state.content!.application['displayName'],
+          brandName: state.content!.brand['displayName'],
         ));
       }),
     );
