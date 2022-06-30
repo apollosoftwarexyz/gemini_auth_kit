@@ -73,7 +73,7 @@ class GeminiDataLayer {
   }
 
   SuccessResponse handleResponse(Response response) {
-    print(response);
+    print(response.statusCode);
     print(response.data.toString());
     if (response.data['success'] == true) {
       print(response.data['payload']);
