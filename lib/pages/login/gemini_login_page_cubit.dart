@@ -28,6 +28,7 @@ class GeminiLoginPageCubit extends Cubit<GeminiLoginPageState> {
       emit(const GeminiLoginPageState.loading());
       final response = await _dataLayer.login(email, password);
       if (!response.isSuccessful) {
+        _handler.handleLoginFailure(response.failure!);
         return emit(GeminiLoginPageState.error(response.failure!.reason));
       }
 
