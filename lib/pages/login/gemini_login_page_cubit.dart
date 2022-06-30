@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gemini_auth_kit/gemini_auth_kit.dart';
 
-import '../../data/gemini_data_layer.dart';
 import '../../data/gemini_response_handler.dart';
 
 class GeminiLoginPageState {
@@ -19,14 +19,14 @@ class GeminiLoginPageState {
 
 class GeminiLoginPageCubit extends Cubit<GeminiLoginPageState> {
   final GeminiResponseHandler _handler;
-  final GeminiDataLayer _dataLayer;
-  GeminiLoginPageCubit(this._dataLayer, this._handler)
+  final GeminiAuthenticationService _authenticationService;
+  GeminiLoginPageCubit(this._authenticationService, this._handler)
       : super(const GeminiLoginPageState.initial());
 
   Future<void> login(String email, String password) async {
     try {
       emit(const GeminiLoginPageState.loading());
-      final response = await _dataLayer.login(email, password);
+      final response = await _authenticationService.login(email, password);
       if (!response.isSuccessful) {
         _handler.handleLoginFailure(response.failure!);
         return emit(GeminiLoginPageState.error(response.failure!.reason));

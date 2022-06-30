@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
-import 'package:gemini_auth_kit/config.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:gemini_auth_kit/data/gemini_data_layer.dart';
+import 'package:gemini_auth_kit/gemini_auth_kit.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:flutter_test/flutter_test.dart';
 
 import 'gemini_data_layer_test.mocks.dart';
 

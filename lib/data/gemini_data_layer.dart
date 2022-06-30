@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:gemini_auth_kit/config/gemini_config.dart';
+import 'package:gemini_auth_kit/abstracts/gemini_config.dart';
 import 'package:gemini_auth_kit/data/failure.dart';
 
 import '../entities/gemini_login_response.dart';
@@ -11,20 +11,25 @@ class GeminiDataLayer {
 
   GeminiDataLayer(this.config, this.dio);
 
-  Future<DataResponse<RawGeminiLoginResponse>> login(String email, String password) async {
+  Future<DataResponse<RawGeminiLoginResponse>> login(
+      String email, String password) async {
     try {
       final response = await dio.post(
-          config.geminiOverrideBaseUrl == null ? 'https://api.gemini.xyz:2070' : config.geminiOverrideBaseUrl!,
-          data: {
-            "email": email,
-            "password": password,
-          },
-          options: Options(sendTimeout: config.connectionTimeout, receiveTimeout: config.receiveTimeout));
+        config.geminiOverrideBaseUrl == null
+            ? 'https://api.gemini.xyz:2070'
+            : config.geminiOverrideBaseUrl!,
+        data: {
+          "email": email,
+          "password": password,
+        },
+      );
 
       final successResponse = handleResponse(response);
-      return DataResponse.success(RawGeminiLoginResponse.fromJson(successResponse.payload));
+      return DataResponse.success(
+          RawGeminiLoginResponse.fromJson(successResponse.payload));
     } on DioError catch (dioError) {
-      if (dioError.type == DioErrorType.connectTimeout || dioError.type == DioErrorType.receiveTimeout) {
+      if (dioError.type == DioErrorType.connectTimeout ||
+          dioError.type == DioErrorType.receiveTimeout) {
         return const DataResponse.failure(GeminiTimeoutFailure());
       } else if (dioError.message.contains('SocketException')) {
         return const DataResponse.failure(GeminiServerConnectionFailure());
@@ -34,7 +39,8 @@ class GeminiDataLayer {
     } on ApiError {
       return const DataResponse.failure(GeminiInternalServerFailure());
     } on GeminiError catch (geminiError) {
-      return DataResponse.failure(GeminiErrorResponseFailure(geminiError.error, geminiError.message));
+      return DataResponse.failure(
+          GeminiErrorResponseFailure(geminiError.error, geminiError.message));
     } catch (e, st) {
       print('$e $st');
       return const DataResponse.failure(GeminiUnknownFailure());
@@ -44,7 +50,8 @@ class GeminiDataLayer {
   SuccessResponse handleResponse(Response response) {
     if (response.data['success'] == true) {
       return SuccessResponse(response.data['payload']);
-    } else if (response.data['success'] == false || response.data['payload'] == null) {
+    } else if (response.data['success'] == false ||
+        response.data['payload'] == null) {
       throw GeminiError(
         response.data['code'],
         response.data['error'],

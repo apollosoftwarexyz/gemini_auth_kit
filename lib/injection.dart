@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:gemini_auth_kit/data/gemini_data_layer.dart';
+import 'package:gemini_auth_kit/gemini_auth_kit.dart';
 import 'package:gemini_auth_kit/pages/login/gemini_login_page_cubit.dart';
+import 'package:gemini_auth_kit/services/gemini_authentication_service.dart';
 import 'package:get_it/get_it.dart';
 
 final GetIt locator = GetIt.instance;
@@ -18,5 +20,7 @@ Future<void> configureInjection(GetIt locator) async {
   }
 
   locator.registerFactory(() => GeminiDataLayer(locator(), locator()));
+  locator.registerLazySingleton<GeminiAuthenticationService>(
+      () => GeminiAuthenticationServiceImpl(locator()));
   locator.registerFactory(() => GeminiLoginPageCubit(locator(), locator()));
 }

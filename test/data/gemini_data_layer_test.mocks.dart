@@ -11,7 +11,7 @@ import 'package:dio/src/dio_mixin.dart' as _i5;
 import 'package:dio/src/options.dart' as _i2;
 import 'package:dio/src/response.dart' as _i6;
 import 'package:dio/src/transformer.dart' as _i4;
-import 'package:gemini_auth_kit/config/gemini_config.dart' as _i10;
+import 'package:gemini_auth_kit/abstracts/gemini_config.dart' as _i10;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint

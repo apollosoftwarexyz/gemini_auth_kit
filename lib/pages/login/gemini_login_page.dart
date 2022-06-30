@@ -52,14 +52,16 @@ class GeminiLoginPage extends StatelessWidget {
       child: BlocConsumer<GeminiLoginPageCubit, GeminiLoginPageState>(
         listener: (context, state) {
           if (state.failure != null) {
-            return WidgetsBinding.instance.addPostFrameCallback((_) => showErrorDialog(context, state.failure!));
+            return WidgetsBinding.instance.addPostFrameCallback(
+                (_) => showErrorDialog(context, state.failure!));
           }
         },
         builder: (context, state) {
           return AppBlockingLoadingView(
             isBlocking: state.isLoading,
             child: GeminiLoginView(
-              onSignIn: (email, password) => context.read<GeminiLoginPageCubit>().login(email, password),
+              onSignIn: (email, password) =>
+                  context.read<GeminiLoginPageCubit>().login(email, password),
               appName: appName,
               brandName: brandName,
               isLoading: isLoading,
@@ -171,16 +173,22 @@ class _GeminiLoginViewState extends State<GeminiLoginView> {
                           Container(height: 10),
                           RichText(
                             text: TextSpan(
-                              style: TextStyle(color: widget.fontColor, fontFamily: "Jost", fontSize: 18),
+                              style: TextStyle(
+                                  color: widget.fontColor,
+                                  fontFamily: "Jost",
+                                  fontSize: 18),
                               children: <TextSpan>[
                                 const TextSpan(
                                   text: 'Please sign in to access',
                                 ),
                                 TextSpan(
                                   text: " ${widget.appName} ",
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
                                 ),
-                                TextSpan(text: 'with your ${widget.brandName} account.')
+                                TextSpan(
+                                    text:
+                                        'with your ${widget.brandName} account.')
                               ],
                             ),
                           ),
@@ -213,7 +221,7 @@ class _GeminiLoginViewState extends State<GeminiLoginView> {
                             controller: passwordController,
                             hintText: widget.passwordHintText,
                             obscureText: true,
-                            validator: widget.emailValidator,
+                            validator: widget.passwordValidator,
                           ),
                           InkWell(
                               splashColor: Colors.transparent,
@@ -232,7 +240,8 @@ class _GeminiLoginViewState extends State<GeminiLoginView> {
                   Container(height: 30),
                   ApolloPrimaryButton(
                       text: 'Sign in to ${widget.appName}',
-                      onPressed: () => widget.onSignIn(emailController.text, passwordController.text)),
+                      onPressed: () => widget.onSignIn(
+                          emailController.text, passwordController.text)),
                   Container(height: 20),
                   InkWell(
                     splashColor: Colors.transparent,
@@ -240,14 +249,19 @@ class _GeminiLoginViewState extends State<GeminiLoginView> {
                     onTap: () {},
                     child: RichText(
                       text: TextSpan(
-                        style: TextStyle(color: widget.fontColor, fontFamily: "Jost", fontSize: 14),
+                        style: TextStyle(
+                            color: widget.fontColor,
+                            fontFamily: "Jost",
+                            fontSize: 14),
                         children: const <TextSpan>[
                           TextSpan(
                             text: "Don't have an account yet?",
                           ),
                           TextSpan(
                               text: ' Sign Up',
-                              style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF8147ff))),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF8147ff))),
                         ],
                       ),
                     ),
