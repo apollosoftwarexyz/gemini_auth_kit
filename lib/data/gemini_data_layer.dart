@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:gemini_auth_kit/abstracts/gemini_config.dart';
 import 'package:gemini_auth_kit/data/failure.dart';
@@ -15,6 +17,10 @@ class GeminiDataLayer {
   Future<DataResponse<RawGeminiLoginResponse>> login(
           String email, String password) async =>
       await handleRequest(() async {
+        dio.options.followRedirects = true;
+        dio.options.validateStatus = (int? status) {
+          return (status != null && status <= 400);
+        };
         final response = await dio.post(
           '${config.geminiOverrideBaseUrl == null ? 'https://api.gemini.xyz:2070/v1/' : config.geminiOverrideBaseUrl!}/auth/login',
           data: {
@@ -27,7 +33,7 @@ class GeminiDataLayer {
           },
         );
 
-        final successResponse = handleResponse(response);
+        final successResponse = await handleResponse(response);
         return DataResponse.success(
             RawGeminiLoginResponse.fromJson(successResponse.payload));
       });
@@ -42,7 +48,7 @@ class GeminiDataLayer {
         },
       );
 
-      final successResponse = handleResponse(response);
+      final successResponse = await handleResponse(response);
       return DataResponse.success(
           GeminiLoginPageContent.fromJson(successResponse.payload));
     });
@@ -59,9 +65,10 @@ class GeminiDataLayer {
       } else if (dioError.message.contains('SocketException')) {
         return const DataResponse.failure(GeminiServerConnectionFailure());
       }
-
+      print('dio error $dioError');
       return const DataResponse.failure(GeminiInternalServerFailure());
     } on ApiError {
+      print('api error');
       return const DataResponse.failure(GeminiInternalServerFailure());
     } on GeminiError catch (geminiError) {
       return DataResponse.failure(
@@ -72,17 +79,20 @@ class GeminiDataLayer {
     }
   }
 
-  SuccessResponse handleResponse(Response response) {
-    print(response.statusCode);
-    print(response.data.toString());
-    if (response.data['success'] == true) {
-      print(response.data['payload']);
+  Future<SuccessResponse> handleResponse(Response response) async {
+    while (response.statusCode != null && response.statusCode == 302) {
+      final location = response.headers.value(HttpHeaders.locationHeader);
+      if (location == null) {
+        break;
+      }
 
+      response = await dio.get(location);
+    }
+
+    if (response.data['success'] == true) {
       return SuccessResponse(response.data['payload']);
     } else if (response.data['success'] == false ||
         response.data['payload'] == null) {
-      print((response.data as Map).keys.toList());
-      print((response.data as Map).values.toList());
       throw GeminiError(
         response.data['code'] ?? 405,
         response.data['error'],

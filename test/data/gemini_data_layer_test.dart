@@ -19,6 +19,8 @@ void main() {
     config = MockGeminiConfig();
 
     when(config.geminiOverrideBaseUrl).thenReturn('url');
+    when(config.appId).thenReturn('');
+    when(config.redirectUrl).thenReturn('');
 
     sut = GeminiDataLayer(config, dio);
   });
@@ -26,7 +28,11 @@ void main() {
   group('Errors', () {
     test('When there is a dio timeout then we get a timeout failure', () async {
       // arrange
-      when(dio.post('url', data: anyNamed('data'))).thenThrow(
+      when(dio.post(
+        any,
+        data: anyNamed('data'),
+        queryParameters: anyNamed('queryParameters'),
+      )).thenThrow(
         DioError(
             requestOptions: requestOptions, type: DioErrorType.receiveTimeout),
       );
@@ -40,7 +46,13 @@ void main() {
 
     test('When there is a dio timeout then we get a timeout failure', () async {
       // arrange
-      when(dio.post('url', data: anyNamed('data'))).thenThrow(
+      when(
+        dio.post(
+          any,
+          data: anyNamed('data'),
+          queryParameters: anyNamed('queryParameters'),
+        ),
+      ).thenThrow(
         DioError(
             requestOptions: requestOptions, type: DioErrorType.connectTimeout),
       );
@@ -52,9 +64,13 @@ void main() {
       expect(response.failure!.error, 'TIMEOUT_ERROR');
     });
 
-    test('When there is a dio error then we get a dio failure', () async {
+    test('When there is a dio error then we get a dio cancel', () async {
       // arrange
-      when(dio.post('url', data: anyNamed('data'))).thenThrow(
+      when(dio.post(
+        any,
+        data: anyNamed('data'),
+        queryParameters: anyNamed('queryParameters'),
+      )).thenThrow(
         DioError(requestOptions: requestOptions, type: DioErrorType.cancel),
       );
       // act
@@ -75,9 +91,12 @@ void main() {
     };
     test('Incorrect username', () async {
       // arrange
-      when(dio.post('url', data: anyNamed('data'))).thenAnswer(
-          (realInvocation) async =>
-              Response<dynamic>(requestOptions: requestOptions, data: error));
+      when(dio.post(
+        any,
+        data: anyNamed('data'),
+        queryParameters: anyNamed('queryParameters'),
+      )).thenAnswer((realInvocation) async =>
+          Response<dynamic>(requestOptions: requestOptions, data: error));
       // act
       final response = await sut.login('email', 'password');
 
@@ -99,13 +118,36 @@ void main() {
 
     test('Successful login response', () async {
       // arrange
-      when(dio.post('url', data: anyNamed('data'))).thenAnswer(
-          (realInvocation) async => Response<dynamic>(
-              requestOptions: requestOptions, data: successResponse));
+      when(dio.post(
+        any,
+        data: anyNamed('data'),
+        queryParameters: anyNamed('queryParameters'),
+      )).thenAnswer((realInvocation) async => Response<dynamic>(
+          requestOptions: requestOptions, data: successResponse));
       // act
       final response = await sut.login('email', 'password');
 
       expect(response.isSuccessful, true);
+    });
+  });
+
+  group('testing redirects', () {
+    test('test 1', () async {
+      when(
+        dio.post(
+          any,
+          data: anyNamed('data'),
+          queryParameters: anyNamed('queryParameters'),
+        ),
+      ).thenAnswer((_) async => Response<dynamic>(
+            requestOptions: requestOptions,
+            statusCode: 302,
+            data:
+                'Redirecting to <a href="http://localhost:2070/auth/done">http://localhost:2070/auth/done</a>.',
+          ));
+
+      // act
+      final response = await sut.login('email', 'password');
     });
   });
 }
